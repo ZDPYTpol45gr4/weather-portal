@@ -69,19 +69,20 @@ def get_all_data_forecast_weather_by_location(location):
 
 
 def weather_7_days_view(request, location):
-    DAYS = 8
+    DAYS = 8  # Number of days that will show weather
 
     data = get_all_data_forecast_weather_by_location(location)
 
     if not data:
         return HttpResponseServerError('<h1>Server Error (500)</h1>', content_type='text/html')
 
-    temperature = [val['temp'] for val in data['daily']]
-    icon = [val['weather'][0]['icon'] for val in data['daily']]
-    weather_description = [val['weather'][0]['main'] for val in data['daily']]
+    temperature = [val['temp'] for val in data['daily']]  # temperatures information for each day
+    icon = [val['weather'][0]['icon'] for val in data['daily']]  # icon indexes
+    weather_description = [val['weather'][0]['main'] for val in data['daily']]  # weather name
 
     actual_date = datetime.datetime.now()
-    dates = [(actual_date + datetime.timedelta(days=day)).strftime("%A") for day in range(DAYS)]
+    dates = [(actual_date + datetime.timedelta(days=day)).strftime("%A")
+             for day in range(DAYS)]  # set date format
 
     for num, val in enumerate(temperature):
         val['day_name'] = dates[num]
