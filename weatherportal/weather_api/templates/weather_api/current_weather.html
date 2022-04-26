@@ -1,50 +1,70 @@
 {% load static %}
-<link href="{% static 'weather_api/current_weather.scss' %}" rel="stylesheet" type="text/css">
-{{temperature}}
+
+<head>
+  <link href="https://tomlutzenberger.github.io/meteocons.css/dist/meteocons.min.css" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="{% static 'weather_api/current_weather.scss' %}" rel="stylesheet" type="text/css">
+
+<!--  <link rel="icon" href="http://openweathermap.org/img/wn/10d@2x.png" type="image/gif" sizes="16x16">-->
+  <link rel="icon" type="image/png" href="http://openweathermap.org/img/wn/10d@2x.png"/>
+</head>
+
+<body>
+
 <div class="main container">
   <div class="row">
     <div class="col-xs-12">
       <div class="col-xs-12 col-sm-6 col-sm-offset-3 col-lg-4 col-lg-offset-4 weather-panel">
         <div class="col-xs-6">
-          <h2>Lucerne<br><small>May 24, 2016</small></h2>
-          <p class="h3"><i class="mi mi-fw mi-lg mi-rain-heavy"></i> Rainy</p>
+          <h2>{{location}}<br><small>{{actual_date}}</small></h2>
+          <p class="h3"><i class="mi mi-fw mi-lg mi-rain-heavy"></i> {{temperature.0.description}}</p>
         </div>
         <div class="col-xs-6 text-center">
           <div class="h1 temperature">
-            <span>12°</span>
+            <span>{{temperature.0.day}}</span>
             <br>
-            <small>8° / 13°</small>
+            <small>{{temperature.0.min}}° / {{temperature.0.max}}°</small>
           </div>
         </div>
         <div class="col-xs-12">
           <ul class="list-inline row forecast">
+
+            {% for data in temperature %}
+            {% if forloop.counter0 != 0 %}
             <li class="col-xs-4 col-sm-2 text-center">
-              <h3 class="h5">Wed</h3>
-              <p><i class="mi mi-fw mi-2x mi-cloud-sun"></i><br>{{day1.min}}°/{{day1.max}}°</p>
+              <h3 class="h5">{{data.day_name}}</h3>
+
+              <p><img src={{data.icon}} alt=""><br>{{data.min}}°/{{data.max}}°</p>
             </li>
-            <li class="col-xs-4 col-sm-2 text-center">
-              <h3 class="h5">Thu</h3>
-              <p><i class="mi mi-fw mi-2x mi-sun"></i><br>{{day2.min}}°/{{day2.max}}°</p>
-            </li>
-            <li class="col-xs-4 col-sm-2 text-center">
-              <h3 class="h5">Fri</h3>
-              <p><i class="mi mi-fw mi-2x mi-cloud-sun"></i><br>{{day3.min}}°/{{day3.max}}°</p>
-            </li>
-            <li class="col-xs-4 col-sm-2 text-center">
-              <h3 class="h5">Sat</h3>
-              <p><i class="mi mi-fw mi-2x mi-rain"></i><br>{{day4.min}}°/{{day4.max}}°</p>
-            </li>
-            <li class="col-xs-4 col-sm-2 text-center">
-              <h3 class="h5">Sun</h3>
-              <p><i class="mi mi-fw mi-2x mi-rain-heavy"></i><br>{{day5.min}}°/{{day5.max}}°°</p>
-            </li>
-            <li class="col-xs-4 col-sm-2 text-center">
-              <h3 class="h5">Mon</h3>
-              <p><i class="mi mi-fw mi-2x mi-clouds"></i><br>{{day6.min}}°/{{day6.max}}°</p>
-            </li>
+<!--            <li class="col-xs-4 col-sm-2 text-center">-->
+<!--              <h3 class="h5">Thu</h3>-->
+<!--              <p><i class="mi mi-fw mi-2x mi-sun"></i><br>{{temp.2.min}}°/{{temp.2.max}}°</p>-->
+<!--            </li>-->
+<!--            <li class="col-xs-4 col-sm-2 text-center">-->
+<!--              <h3 class="h5">Fri</h3>-->
+<!--              <p><i class="mi mi-fw mi-2x mi-cloud-sun"></i><br>{{temp.3.min}}°/{{temp.3.max}}°</p>-->
+<!--            </li>-->
+<!--            <li class="col-xs-4 col-sm-2 text-center">-->
+<!--              <h3 class="h5">Sat</h3>-->
+<!--              <p><i class="mi mi-fw mi-2x mi-rain"></i><br>{{temp.4.min}}°/{{temp.4.max}}°</p>-->
+<!--            </li>-->
+<!--            <li class="col-xs-4 col-sm-2 text-center">-->
+<!--              <h3 class="h5">Sun</h3>-->
+<!--              <p><i class="mi mi-fw mi-2x mi-rain-heavy"></i><br>{{temp.5.min}}°/{{temp.5.max}}°</p>-->
+<!--            </li>-->
+<!--            <li class="col-xs-4 col-sm-2 text-center">-->
+<!--              <h3 class="h5">Mon</h3>-->
+<!--              <p><i class="mi mi-fw mi-2x mi-clouds"></i><br>{{temp.6.min}}°/{{temp.6.max}}°</p>-->
+<!--            </li>-->
+            {% endif %}
+            {% endfor %}
+
           </ul>
         </div>
       </div>
     </div>
   </div>
 </div>
+
+</body>
