@@ -11,31 +11,33 @@
 </head>
 
 <body>
-
+{{data}}
 <div class="main container">
   <div class="row">
     <div class="col-xs-12">
       <div class="col-xs-12 col-sm-6 col-sm-offset-3 col-lg-4 col-lg-offset-4 weather-panel">
         <div class="col-xs-6">
           <h2>{{location}}<br><small>{{actual_date}}</small></h2>
-          <p class="h3"><i class="mi mi-fw mi-lg mi-rain-heavy"></i> {{temperature.0.description}}</p>
+          <p class="h3"><i class="mi mi-fw mi-lg mi-rain-heavy"></i> {{data.0.description}}</p>
         </div>
         <div class="col-xs-6 text-center">
           <div class="h1 temperature">
-            <span>{{temperature.0.day}}</span>
+            <span>{{data.0.day}}</span>
             <br>
-            <small>{{temperature.0.min}}° / {{temperature.0.max}}°</small>
+            <small>{{data.0.min}}° / {{data.0.max}}°</small>
+            <small>{{data.0.desc}}</small>
           </div>
         </div>
         <div class="col-xs-12">
           <ul class="list-inline row forecast">
 
-            {% for data in temperature %}
+            {% for data_ in data %}
             {% if forloop.counter0 != 0 %}
             <li class="col-xs-4 col-sm-2 text-center">
-              <h3 class="h5">{{data.day_name}}</h3>
+              <h3 class="h5">{{data_.day_name}}</h3>
 
-              <p><img src={{data.icon}} alt=""><br>{{data.min}}°/{{data.max}}°</p>
+              <p><img src={{data_.icon}} alt=""><br>{{data_.min}}°/{{data_.max}}°</p>
+              <p>{{data_.desc}}</p>
             </li>
 <!--            <li class="col-xs-4 col-sm-2 text-center">-->
 <!--              <h3 class="h5">Thu</h3>-->
