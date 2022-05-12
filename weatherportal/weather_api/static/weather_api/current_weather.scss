@@ -10,9 +10,6 @@
   overflow: hidden;
   position: relative;
 
-  li.col-xs-4 col-sm-2 text-center {
-    color: red;
-  }
   small {
     color: inherit;
     font-size: 50%;
@@ -25,4 +22,8 @@
         font-size: 2em;
     }
   }
+}
+
+li#list {
+  display: inline-block;
 }

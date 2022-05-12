@@ -1,17 +1,10 @@
 {% load static %}
 
 <head>
-  <link href="https://tomlutzenberger.github.io/meteocons.css/dist/meteocons.min.css" rel="stylesheet">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
   <link href="{% static 'weather_api/current_weather.scss' %}" rel="stylesheet" type="text/css">
-
-<!--  <link rel="icon" href="http://openweathermap.org/img/wn/10d@2x.png" type="image/gif" sizes="16x16">-->
-  <link rel="icon" type="image/png" href="http://openweathermap.org/img/wn/10d@2x.png"/>
 </head>
 
 <body>
-{{data}}
 <div class="main container">
   <div class="row">
     <div class="col-xs-12">
@@ -24,7 +17,7 @@
           <div class="h1 temperature">
             <span>{{data.0.day}}</span>
             <br>
-            <small>{{data.0.min}}° / {{data.0.max}}°</small>
+            <small>{{data.0.min|add:"0"}}° / {{data.0.max|add:"0"}}°</small>
             <small>{{data.0.desc}}</small>
           </div>
         </div>
@@ -33,40 +26,20 @@
 
             {% for data_ in data %}
             {% if forloop.counter0 != 0 %}
-            <li class="col-xs-4 col-sm-2 text-center">
-              <h3 class="h5">{{data_.day_name}}</h3>
+              <li class="col-xs-4 col-sm-2 text-center" id="list">
+                <h3 class="h5">{{data_.day_name}}</h3>
 
-              <p><img src={{data_.icon}} alt=""><br>{{data_.min}}°/{{data_.max}}°</p>
-              <p>{{data_.desc}}</p>
-            </li>
-<!--            <li class="col-xs-4 col-sm-2 text-center">-->
-<!--              <h3 class="h5">Thu</h3>-->
-<!--              <p><i class="mi mi-fw mi-2x mi-sun"></i><br>{{temp.2.min}}°/{{temp.2.max}}°</p>-->
-<!--            </li>-->
-<!--            <li class="col-xs-4 col-sm-2 text-center">-->
-<!--              <h3 class="h5">Fri</h3>-->
-<!--              <p><i class="mi mi-fw mi-2x mi-cloud-sun"></i><br>{{temp.3.min}}°/{{temp.3.max}}°</p>-->
-<!--            </li>-->
-<!--            <li class="col-xs-4 col-sm-2 text-center">-->
-<!--              <h3 class="h5">Sat</h3>-->
-<!--              <p><i class="mi mi-fw mi-2x mi-rain"></i><br>{{temp.4.min}}°/{{temp.4.max}}°</p>-->
-<!--            </li>-->
-<!--            <li class="col-xs-4 col-sm-2 text-center">-->
-<!--              <h3 class="h5">Sun</h3>-->
-<!--              <p><i class="mi mi-fw mi-2x mi-rain-heavy"></i><br>{{temp.5.min}}°/{{temp.5.max}}°</p>-->
-<!--            </li>-->
-<!--            <li class="col-xs-4 col-sm-2 text-center">-->
-<!--              <h3 class="h5">Mon</h3>-->
-<!--              <p><i class="mi mi-fw mi-2x mi-clouds"></i><br>{{temp.6.min}}°/{{temp.6.max}}°</p>-->
-<!--            </li>-->
+                <p><img src={{data_.icon}} alt=""><br>{{data_.min|add:"0"}}°/{{data_.max|add:"0"}}°</p>
+                <p>{{data_.desc}}</p>
+              </li>
             {% endif %}
             {% endfor %}
-
           </ul>
         </div>
       </div>
     </div>
   </div>
 </div>
+
 
 </body>
