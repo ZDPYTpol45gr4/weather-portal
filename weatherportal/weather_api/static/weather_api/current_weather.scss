@@ -24,6 +24,52 @@
   }
 }
 
-li#list {
-  display: inline-block;
+#li-weather {
+  display: table-cell;
+  padding: 2px;
 }
+
+#ul-weather {
+  display: table;
+  width: 100%;
+}
+
+.header-class-weather {
+  width: 80%;
+  margin-left: 10%;
+  margin-top: 20px;
+  margin-bottom: 15px;
+
+}
+
+.header-weather {
+  display: table-cell;
+  width: 40%;
+}
+
+.center {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  width: 50%;
+}
+
+.text-align-center {
+  text-align: center;
+}
+
+.margin-bottom {
+  margin-bottom: 0px;
+}
+
+.border-top {
+
+  border-style: solid none none none;
+  width: 80%;
+  margin-left: 10%;
+}
+
+.text-center {
+  text-align: center;
+}
+

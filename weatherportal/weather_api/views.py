@@ -57,6 +57,9 @@ def get_actual_date():
 
 
 def get_days_format(days=8):
+    """
+    Function return list of named days, they are up to param 'days'
+    """
     dates = [(get_actual_date() + datetime.timedelta(days=day)).strftime("%A")
              for day in range(days)]
     return dates
