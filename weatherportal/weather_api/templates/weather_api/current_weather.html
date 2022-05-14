@@ -21,9 +21,9 @@
           </div>
 
           <div class="text-center header-weather">
-            <span style="font-size: xxx-large">{{data.0.day}}</span>
+            <span style="font-size: xxx-large">{{data.0.temp}}</span>
             <br>
-            <small>{{data.0.min|add:"0"}}° / {{data.0.max|add:"0"}}°</small>
+            <small>{{data.0.temp_min}}° / {{data.0.temp_max}}°</small>
             <small>{{data.0.desc}}</small>
           </div>
         </div>
@@ -31,13 +31,13 @@
         <div class="col-xs-12 border-top" id="ul-list">
           <ul id="ul-weather" style="padding-left: 0px;">
 
-            {% for data_ in data %}
+            {% for day_data in data %}
             {% if forloop.counter0 != 0 %}
               <li  id="li-weather" >
-                <h3 class="h5 text-align-center" >{{data_.day_name}}</h3>
+                <h3 class="h5 text-align-center" >{{day_data.day_name}}</h3>
 
-                <p class="margin-bottom"><img class="center" src={{data_.icon}} alt=""><br><div class="center text-align-center">{{data_.min|add:"0"}}°/{{data_.max|add:"0"}}°</div></p>
-                <p class="center text-align-center">{{data_.desc}}</p>
+                <p class="margin-bottom"><img class="center" src={{day_data.icon}} alt=""><br><div class="center text-align-center">{{day_data.temp_min}}°/{{day_data.temp_max}}°</div></p>
+                <p class="center text-align-center">{{day_data.desc}}</p>
               </li>
 
             {% endif %}

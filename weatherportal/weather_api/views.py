@@ -1,5 +1,6 @@
 import os
 import datetime
+from pprint import pprint
 
 from django.http import HttpResponseServerError
 from django.shortcuts import render, redirect
@@ -17,7 +18,6 @@ def get_location(location):
     )
     if not response_location_coords.ok:
         raise ValueError('get_location api response return invalid value')
-    print(response_location_coords)
 
     get_data_coords = response_location_coords.json()
 
@@ -38,8 +38,6 @@ def get_all_data_forecast_weather_by_location(location):
     """
 
     data_coords = get_location(location)
-    print(data_coords)
-
 
     lat = data_coords['lat']
     lon = data_coords['lon']
@@ -56,7 +54,8 @@ def get_all_data_forecast_weather_by_location(location):
 
 def get_weather(location):
     data = get_all_data_forecast_weather_by_location(location)
-    return WeatherInfo.get_dict_for_daily(data, get_days_format())
+    pprint(data)
+    return WeatherInfo.get_weather_list_from_dict(data, get_days_format())
 
 
 def get_actual_date():
@@ -77,7 +76,7 @@ def weather_multi_days_view(request, location, day):
     if not data:
         return HttpResponseServerError('<h1>Server Error (500)</h1>', content_type='text/html')
 
-    data = data.data[:day]
+    data = data.weather_data[:day]
 
     ctx = {'data': data, 'location': location, 'actual_date': get_actual_date()}
     return render(request, 'weather_api/current_weather.html', ctx)
