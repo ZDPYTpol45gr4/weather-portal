@@ -3,5 +3,5 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    path('weather-7-days/<str:location>', views.weather_7_days_view, name='weather_api_weather_7_days_view'),
+    path('weather-multi-days/<str:location>/<int:day>', views.weather_multi_days_view, name='weather_api_weather_multi_days_view'),
 ]

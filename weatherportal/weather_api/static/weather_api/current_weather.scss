@@ -27,11 +27,13 @@
 #li-weather {
   display: table-cell;
   padding: 2px;
+
 }
 
 #ul-weather {
   display: table;
   width: 100%;
+  max-height: 150px;
 }
 
 .header-class-weather {
@@ -73,3 +75,14 @@
   text-align: center;
 }
 
+#ul-list {
+  display: block;
+  justify-content: center;
+  text-align: center;
+
+}
+
+#li-weather {
+  display: inline-block;
+  float: inside;
+}

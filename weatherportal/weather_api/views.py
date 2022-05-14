@@ -11,16 +11,19 @@ API_KEY = os.getenv('API_KEY')
 
 
 def get_location(location):
-    try:
-        response_location_coords = requests.get(
-            f'http://api.openweathermap.org/geo/1.0/direct?q={location}&limit=5&appid={API_KEY}'
-        )
-        get_data_coords = response_location_coords.json()
 
-        return get_data_coords[0]
+    response_location_coords = requests.get(
+        f'http://api.openweathermap.org/geo/1.0/direct?q={location}&limit=5&appid={API_KEY}'
+    )
+    if not response_location_coords.ok:
+        raise ValueError('get_location api response return invalid value')
+    print(response_location_coords)
 
-    except IndexError:
-        return None
+    get_data_coords = response_location_coords.json()
+
+    if not get_data_coords:  # check if data are avaliable from api
+        raise ValueError('Empty data from getting location by location')
+    return get_data_coords[0]
 
 
 def get_all_data_forecast_weather_by_location(location):
@@ -35,21 +38,25 @@ def get_all_data_forecast_weather_by_location(location):
     """
 
     data_coords = get_location(location)
-    if data_coords:  # check if data are avaliable from api
+    print(data_coords)
 
-        lat = data_coords['lat']
-        lon = data_coords['lon']
-        try:
-            response_weather = requests.get(
-                f'https://api.openweathermap.org/data/2.5/onecall?lat={lat}&lon={lon}&units=metric&appid={API_KEY}'
-            )
-            get_data_weather = response_weather.json()
 
-            return WeatherInfo.get_dict_for_daily(get_data_weather, get_days_format())
-        except requests.exceptions.HTTPError:
-            return None
-    else:
-        return None
+    lat = data_coords['lat']
+    lon = data_coords['lon']
+
+    response_weather = requests.get(
+        f'https://api.openweathermap.org/data/2.5/onecall?lat={lat}&lon={lon}&units=metric&appid={API_KEY}'
+    )
+
+    if not response_weather.ok:
+        raise ValueError('get_all_data_forecast_weather_by_location api response return invalid value')
+
+    return response_weather.json()
+
+
+def get_weather(location):
+    data = get_all_data_forecast_weather_by_location(location)
+    return WeatherInfo.get_dict_for_daily(data, get_days_format())
 
 
 def get_actual_date():
@@ -58,18 +65,19 @@ def get_actual_date():
 
 def get_days_format(days=8):
     """
-    Function return list of named days, they are up to param 'days'
+        Function return list of named days, they are up to param 'days'
     """
     dates = [(get_actual_date() + datetime.timedelta(days=day)).strftime("%A")
              for day in range(days)]
     return dates
 
 
-def weather_7_days_view(request, location):
-    data = get_all_data_forecast_weather_by_location(location)
+def weather_multi_days_view(request, location, day):
+    data = get_weather(location)
     if not data:
         return HttpResponseServerError('<h1>Server Error (500)</h1>', content_type='text/html')
 
+    data = data.data[:day]
 
-    ctx = {'data': data.data, 'location': location, 'actual_date': get_actual_date()}
+    ctx = {'data': data, 'location': location, 'actual_date': get_actual_date()}
     return render(request, 'weather_api/current_weather.html', ctx)
