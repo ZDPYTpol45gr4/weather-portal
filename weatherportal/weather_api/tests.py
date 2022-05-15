@@ -3,9 +3,8 @@ import os
 import datetime
 
 from django.test import TestCase
-from unittest.mock import MagicMock, Mock, patch
 
-from .views import get_location, get_all_data_forecast_weather_by_location, get_actual_date, get_days_format
+from .views import get_location, get_actual_date, get_days_format
 
 API_KEY = os.getenv('API_KEY')
 
@@ -81,14 +80,3 @@ class TestApiGetData(TestCase):
         with self.assertRaises(ValueError):
             data = get_location('L234d')
 
-    # def test_get_all_data_forecast_weather_by_location_return_dict_properly(self):
-    #     response = get_all_data_forecast_weather_by_location('London')
-    #
-    #     self.assertContains(response, 'alerts')
-    #     self.assertJSONEqual(response, )
-    #     self.assertContains(response, 'current')
-    #     self.assertContains(response, 'daily')
-    #     self.assertContains(response, 'hourly')
-    #     self.assertContains(response, 'lat')
-    #     self.assertContains(response, 'lon')
-    #     self.assertContains(response, 'minutely')
