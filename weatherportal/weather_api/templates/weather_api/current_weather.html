@@ -21,7 +21,7 @@
           </div>
 
           <div class="text-center header-weather">
-            <span style="font-size: xxx-large">{{data.0.temp}}</span>
+            <span style="font-size: xxx-large">{{data.0.temp_avg}}</span>
             <br>
             <small>{{data.0.temp_min}}° / {{data.0.temp_max}}°</small>
             <small>{{data.0.desc}}</small>
@@ -34,10 +34,10 @@
             {% for day_data in data %}
             {% if forloop.counter0 != 0 %}
               <li  id="li-weather" >
-                <h3 class="h5 text-align-center" >{{day_data.day_name}}</h3>
+                <h3 class="h5 text-align-center" >{{day_data.days_names}}</h3>
 
                 <p class="margin-bottom"><img class="center" src={{day_data.icon}} alt=""><br><div class="center text-align-center">{{day_data.temp_min}}°/{{day_data.temp_max}}°</div></p>
-                <p class="center text-align-center">{{day_data.desc}}</p>
+                <p class="center text-align-center">{{day_data.description}}</p>
               </li>
 
             {% endif %}

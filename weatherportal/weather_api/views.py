@@ -1,11 +1,13 @@
 import os
 import datetime
+from pprint import pprint
 
 from django.http import HttpResponseServerError
 from django.shortcuts import render
 
 import requests
-from .weather_data_class import WeatherInfo
+from .data_classes import WeatherInfo
+from .validators import Validator
 
 API_KEY = os.getenv('API_KEY')
 
@@ -16,14 +18,12 @@ def get_location(location):
     )
 
     if not response_location_coords.ok:
-        raise ValueError('get_location api response return invalid value')
+        raise ValueError('get_location api response return status_code higher then 400')
 
     get_data_coords = response_location_coords.json()
+    Validator.validate_location(get_data_coords)
 
-    if not get_data_coords:  # check if data are available from api
-        raise ValueError('Empty data from getting location by location')
-
-    return get_data_coords[0]
+    return get_data_coords
 
 
 def get_all_data_forecast_weather_by_location(location):
@@ -37,7 +37,7 @@ def get_all_data_forecast_weather_by_location(location):
         Historical weather data for the previous 5 days
     """
 
-    data_coords = get_location(location)
+    data_coords = get_location(location)[0]
 
     lat = data_coords['lat']
     lon = data_coords['lon']
@@ -47,13 +47,18 @@ def get_all_data_forecast_weather_by_location(location):
     )
 
     if not response_weather.ok:
-        raise ValueError('get_all_data_forecast_weather_by_location api response return invalid value')
+        raise ValueError('get_all_data_forecast_weather_by_location api response return status_code higher then 400')
 
     return response_weather.json()
 
 
 def get_weather(location):
+    """
+        Get weather and validate data
+    """
     data = get_all_data_forecast_weather_by_location(location)
+    Validator.validate_weather(data)
+
     return WeatherInfo.get_weather_list_from_dict(data, get_days_format())
 
 
@@ -61,13 +66,14 @@ def get_actual_date():
     return datetime.datetime.now()
 
 
-def get_days_format(days=8):
+def get_days_format():
     """
         Function return list of named days, they are up to param 'days'
     """
+    DAYS_NUMBER = 8
 
     dates = [(get_actual_date() + datetime.timedelta(days=day)).strftime("%A")
-             for day in range(days)]
+             for day in range(DAYS_NUMBER)]
     return dates
 
 
@@ -82,6 +88,7 @@ def weather_multi_days_view(request, location, day):
 
     try:
         data = get_weather(location)
+    #TODO: Caught all exceptions and react differently
     except Exception as e:
         return HttpResponseServerError(f'<h1>{e}</h1>', content_type='text/html')
 

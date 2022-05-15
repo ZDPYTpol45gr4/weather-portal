@@ -28,7 +28,7 @@ class TestApiGetData(TestCase):
             'Saturday',
             'Sunday',
         )
-        data = get_days_format(8)
+        data = get_days_format()
         for day in data:
             self.assertIn(day, DAYS_NAMES)
 

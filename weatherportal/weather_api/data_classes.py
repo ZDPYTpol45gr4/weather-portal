@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+import datetime
 
 
 @dataclass
@@ -19,26 +20,27 @@ class WeatherInfo:
 
 @dataclass
 class WeatherInfoOneDay:
-    temp: int
+    temp_avg: int
     temp_min: int
     temp_max: int
-    desc: str
+    description: str
     icon: str
-    day_name: str
+    days_names: list[datetime]
 
+    # TODO Make data ready to parse, dont parse it here
     @classmethod
-    def get_day_from_dict(cls, data: dict, day_name: str):
-        tmp = int(data['temp']['day'])
+    def get_day_from_dict(cls, data: dict, days_names: list[datetime]) -> "WeatherInfoOneDay":
+        tmp_avg = int(data['temp']['day'])
         temp_min = int(data['temp']['min'])
         temp_max = int(data['temp']['max'])
         desc = data['weather'][0]['main']
         icon = f"http://openweathermap.org/img/wn/{data['weather'][0]['icon']}@2x.png"
 
         return cls(
-            temp=tmp,
+            temp_avg=tmp_avg,
             temp_max=temp_max,
             temp_min=temp_min,
-            desc=desc,
+            description=desc,
             icon=icon,
-            day_name=day_name
+            days_names=days_names
         )
