@@ -1,6 +1,5 @@
 import os
 import datetime
-from pprint import pprint
 
 from django.http import HttpResponseServerError
 from django.shortcuts import render, redirect
@@ -12,7 +11,6 @@ API_KEY = os.getenv('API_KEY')
 
 
 def get_location(location):
-
     response_location_coords = requests.get(
         f'http://api.openweathermap.org/geo/1.0/direct?q={location}&limit=5&appid={API_KEY}'
     )
@@ -54,7 +52,6 @@ def get_all_data_forecast_weather_by_location(location):
 
 def get_weather(location):
     data = get_all_data_forecast_weather_by_location(location)
-    pprint(data)
     return WeatherInfo.get_weather_list_from_dict(data, get_days_format())
 
 
@@ -72,7 +69,11 @@ def get_days_format(days=8):
 
 
 def weather_multi_days_view(request, location, day):
-    data = get_weather(location)
+    try:
+        data = get_weather(location)
+    except Exception as e:
+        return HttpResponseServerError(f'<h1>{e}</h1>', content_type='text/html')
+
     if not data:
         return HttpResponseServerError('<h1>Server Error (500)</h1>', content_type='text/html')
 

@@ -10,7 +10,6 @@ class WeatherInfo:
         out_data = []
 
         for day in range(len(days_name)):
-            print(day)
             out_data.append(WeatherInfoOneDay.get_day_from_dict(data['daily'][day], days_name[day]))
 
         return cls(

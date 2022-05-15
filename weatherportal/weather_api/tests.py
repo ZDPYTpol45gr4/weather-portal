@@ -1,22 +1,34 @@
-import unittest.mock
-import responses
-import json
-
 import requests
 import os
-#import pytest
+import datetime
 
 from django.test import TestCase
-#from nose.tools import assert_true
-from http import HTTPStatus
+from unittest.mock import MagicMock, Mock, patch
 
-from .views import get_location, get_weather, get_days_format
-from .weather_data_class import WeatherInfo
+from .views import get_location, get_all_data_forecast_weather_by_location, get_actual_date, get_days_format
 
 API_KEY = os.getenv('API_KEY')
 
 
 class TestApiGetData(TestCase):
+    def test_get_actual_date_return_good_date(self):
+        date = get_actual_date()
+        self.assertEqual(date, datetime.datetime.now())
+
+    def test_get_days_format_return_good_data_names(self):
+        DAYS_NAMES = (
+            'Monday',
+            'Tuesday',
+            'Wednesday',
+            'Thirday',
+            'Thursday',
+            'Friday',
+            'Saturday',
+            'Sunday',
+        )
+        data = get_days_format(8)
+        for day in data:
+            self.assertIn(day, DAYS_NAMES)
 
     def test_api_response_get_location(self):
         """Test location api response"""
@@ -47,7 +59,6 @@ class TestApiGetData(TestCase):
 
         self.assertRaisesMessage(ValueError, 'Empty data from getting location by location', get_location, 'Lo234n')
 
-
     def test_get_location_return_coords(self):
         data = {
             'name': 'Paris',
@@ -60,9 +71,24 @@ class TestApiGetData(TestCase):
 
         server_output = get_location('Paris')
         self.assertEqual(data['lat'], server_output['lat'])
+        self.assertEqual(data['lon'], server_output['lon'])
+        self.assertEqual(data['country'], server_output['country'])
+        self.assertEqual(data['name'], server_output['name'])
+        self.assertEqual(data['state'], server_output['state'])
+        self.assertIsNotNone(server_output['local_names'])
 
+    def test_get_location_raises_exception(self):
+        with self.assertRaises(ValueError):
+            data = get_location('L234d')
 
-    def test_get_all_data_forecast_weather_by_location_return_dict_properly(self):
-        data = {
-            ''
-        }
+    # def test_get_all_data_forecast_weather_by_location_return_dict_properly(self):
+    #     response = get_all_data_forecast_weather_by_location('London')
+    #
+    #     self.assertContains(response, 'alerts')
+    #     self.assertJSONEqual(response, )
+    #     self.assertContains(response, 'current')
+    #     self.assertContains(response, 'daily')
+    #     self.assertContains(response, 'hourly')
+    #     self.assertContains(response, 'lat')
+    #     self.assertContains(response, 'lon')
+    #     self.assertContains(response, 'minutely')
