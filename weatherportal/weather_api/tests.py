@@ -1,3 +1,6 @@
+from unittest import mock
+from unittest.mock import patch
+
 import requests
 import os
 import datetime
@@ -34,6 +37,13 @@ class TestApiGetData(TestCase):
         response = requests.get(f'http://api.openweathermap.org/geo/1.0/direct?q=London&limit=5&appid={API_KEY}')
 
         self.assertTrue(response.ok)
+
+    def test_get_location_causes_exception_when_get_empty_data_from_api(self):
+        with mock.patch.object(
+                requests.get(f'http://api.openweathermap.org/geo/1.0/direct?q=London&limit=5&appid={API_KEY}'), 'json',
+                return_value=[]):
+            with self.assertRaises(ValueError):
+                val = get_location('Something')
 
     def test_api_response_get_weather_data(self):
         """Test weather api response"""
@@ -79,4 +89,3 @@ class TestApiGetData(TestCase):
     def test_get_location_raises_exception(self):
         with self.assertRaises(ValueError):
             data = get_location('L234d')
-

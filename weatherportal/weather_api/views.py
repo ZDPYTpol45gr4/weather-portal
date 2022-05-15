@@ -14,7 +14,6 @@ def get_location(location):
     response_location_coords = requests.get(
         f'http://api.openweathermap.org/geo/1.0/direct?q={location}&limit=5&appid={API_KEY}'
     )
-    print('Api key', API_KEY)
 
     if not response_location_coords.ok:
         raise ValueError('get_location api response return invalid value')
