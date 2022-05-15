@@ -2,7 +2,7 @@ import os
 import datetime
 
 from django.http import HttpResponseServerError
-from django.shortcuts import render, redirect
+from django.shortcuts import render
 
 import requests
 from .weather_data_class import WeatherInfo
@@ -14,13 +14,16 @@ def get_location(location):
     response_location_coords = requests.get(
         f'http://api.openweathermap.org/geo/1.0/direct?q={location}&limit=5&appid={API_KEY}'
     )
+    print('Api key', API_KEY)
+
     if not response_location_coords.ok:
         raise ValueError('get_location api response return invalid value')
 
     get_data_coords = response_location_coords.json()
 
-    if not get_data_coords:  # check if data are avaliable from api
+    if not get_data_coords:  # check if data are available from api
         raise ValueError('Empty data from getting location by location')
+
     return get_data_coords[0]
 
 
@@ -63,12 +66,21 @@ def get_days_format(days=8):
     """
         Function return list of named days, they are up to param 'days'
     """
+
     dates = [(get_actual_date() + datetime.timedelta(days=day)).strftime("%A")
              for day in range(days)]
     return dates
 
 
 def weather_multi_days_view(request, location, day):
+    """
+        View showing forecast for specific location
+
+        :param location: location, in which weather will be show
+        :param day: number of days for forecast
+        :return: weather view
+    """
+
     try:
         data = get_weather(location)
     except Exception as e:
