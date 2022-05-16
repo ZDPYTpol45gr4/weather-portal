@@ -7,16 +7,12 @@ import datetime
 
 from django.test import TestCase
 
-from .views import get_location, get_actual_date, get_days_format
+from .views import get_location, get_days_format
 
 API_KEY = os.getenv('API_KEY')
 
 
 class TestApiGetData(TestCase):
-    def test_get_actual_date_return_good_date(self):
-        date = get_actual_date()
-        self.assertEqual(date, datetime.datetime.now())
-
     def test_get_days_format_return_good_data_names(self):
         DAYS_NAMES = (
             'Monday',
@@ -66,7 +62,7 @@ class TestApiGetData(TestCase):
             Fuction get location from url, location is wrong, api return empty data
         """
 
-        self.assertRaisesMessage(ValueError, 'Empty data from getting location by location', get_location, 'Lo234n')
+        self.assertRaisesMessage(ValueError, 'No data from location api', get_location, 'Lo234n')
 
     def test_get_location_return_coords(self):
         data = {
@@ -78,7 +74,7 @@ class TestApiGetData(TestCase):
             'state': 'Ile-de-France'
         }
 
-        server_output = get_location('Paris')
+        server_output = get_location('Paris')[0]
         self.assertEqual(data['lat'], server_output['lat'])
         self.assertEqual(data['lon'], server_output['lon'])
         self.assertEqual(data['country'], server_output['country'])

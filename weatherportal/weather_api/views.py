@@ -1,12 +1,12 @@
-import os
 import datetime
-from pprint import pprint
+import os
 
+import requests
 from django.http import HttpResponseServerError
 from django.shortcuts import render
 
-import requests
 from .data_classes import WeatherInfo
+from .exceptions import exception_check, ServerResponseError
 from .validators import Validator
 
 API_KEY = os.getenv('API_KEY')
@@ -18,7 +18,9 @@ def get_location(location):
     )
 
     if not response_location_coords.ok:
-        raise ValueError('get_location api response return status_code higher then 400')
+        raise ServerResponseError(
+            'location api response return status_code higher then 400'
+        )
 
     get_data_coords = response_location_coords.json()
     Validator.validate_location(get_data_coords)
@@ -47,7 +49,9 @@ def get_all_data_forecast_weather_by_location(location):
     )
 
     if not response_weather.ok:
-        raise ValueError('get_all_data_forecast_weather_by_location api response return status_code higher then 400')
+        raise ServerResponseError(
+            'get_all_data_forecast_weather_by_location api response return status_code higher then 400'
+        )
 
     return response_weather.json()
 
@@ -62,17 +66,13 @@ def get_weather(location):
     return WeatherInfo.get_weather_list_from_dict(data, get_days_format())
 
 
-def get_actual_date():
-    return datetime.datetime.now()
-
-
 def get_days_format():
     """
         Function return list of named days, they are up to param 'days'
     """
     DAYS_NUMBER = 8
 
-    dates = [(get_actual_date() + datetime.timedelta(days=day)).strftime("%A")
+    dates = [(datetime.datetime.now() + datetime.timedelta(days=day)).strftime("%A")
              for day in range(DAYS_NUMBER)]
     return dates
 
@@ -88,14 +88,11 @@ def weather_multi_days_view(request, location, day):
 
     try:
         data = get_weather(location)
-    #TODO: Caught all exceptions and react differently
-    except Exception as e:
-        return HttpResponseServerError(f'<h1>{e}</h1>', content_type='text/html')
-
-    if not data:
-        return HttpResponseServerError('<h1>Server Error (500)</h1>', content_type='text/html')
+    except Exception as exce:
+        message = exception_check(exce)
+        return HttpResponseServerError(message, content_type='text/html')
 
     data = data.weather_data[:day]
 
-    ctx = {'data': data, 'location': location, 'actual_date': get_actual_date()}
+    ctx = {'data': data, 'location': location, 'actual_date': datetime.datetime.now()}
     return render(request, 'weather_api/current_weather.html', ctx)
