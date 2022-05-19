@@ -38,14 +38,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-<<<<<<< HEAD
-=======
     'weather_api',
-    'crispy_forms',
->>>>>>> 027a610dbcb7aca3c3ade524bf164188cba3e864
     'register.apps.RegisterConfig',
-    'weather_api',
-    'crispy_forms',
 ]
 
 MIDDLEWARE = [
