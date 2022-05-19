@@ -1,0 +1,53 @@
+{% load static %}
+
+<head>
+  <link href="{% static 'weather_api/current_weather.scss' %}" rel="stylesheet" type="text/css">
+</head>
+
+<body>
+<div class="main container">
+  <div class="row">
+    <div class="col-xs-12">
+      <div class="col-xs-12 col-sm-6 col-sm-offset-3 col-lg-4 col-lg-offset-4 weather-panel">
+
+        <div class="header-class-weather">
+          <div class="header-weather">
+            <h2 style="font-size: xx-large; margin-bottom: 0px;">{{location|capfirst }}</h2><br><small style="font-size: smaller">{{actual_date}}</small>
+            <p class="h3"><i class="mi mi-fw mi-lg mi-rain-heavy"></i> {{data.0.description}}</p>
+          </div>
+
+          <div class="header-weather">
+            <img style="position: absolute;" src={{data.0.icon}} alt="">
+          </div>
+
+          <div class="text-center header-weather">
+            <span style="font-size: xxx-large">{{data.0.temp}}</span>
+            <br>
+            <small>{{data.0.temp_min}}° / {{data.0.temp_max}}°</small>
+            <small>{{data.0.desc}}</small>
+          </div>
+        </div>
+
+        <div class="col-xs-12 border-top" id="ul-list">
+          <ul id="ul-weather" style="padding-left: 0px;">
+
+            {% for day_data in data %}
+            {% if forloop.counter0 != 0 %}
+              <li  id="li-weather" >
+                <h3 class="h5 text-align-center" >{{day_data.day_name}}</h3>
+
+                <p class="margin-bottom"><img class="center" src={{day_data.icon}} alt=""><br><div class="center text-align-center">{{day_data.temp_min}}°/{{day_data.temp_max}}°</div></p>
+                <p class="center text-align-center">{{day_data.desc}}</p>
+              </li>
+
+            {% endif %}
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+</body>
