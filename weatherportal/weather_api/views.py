@@ -135,27 +135,40 @@ def weather_multi_days_view(request, location, day):
     return render(request, 'weather_api/current_weather.html', ctx)
 
 
+def get_all_cities_names(location):
+    cities = get_location(location)
+    print('cities', cities)
+    print(len(cities))
+    out_lst = []
+    for city in cities:
+        lat = float(city['lat'])
+        lon = float(city['lon'])
+        coords_objects = CoordPoints(lat=lat, lon=lon, state=city['state'],
+                                     name=city['name'], country=city['country'])
+        out_lst.append((f'{lat}, {lon}', coords_objects))
+
+    return out_lst
+
+
 def cities_form_view(request, location):
     """
         Form allows user to choice city, cities can have same name in different location
     """
     if request.method == 'POST':
+        post = request.POST
+        coords = post['city_choice_field'].split(',')
 
-        form = SelectCityForm(location=location, data=request.POST)
+        lat, lon = float(coords[0]), float(coords[1])
+        day = int(request.POST['forecast_days_limit_choice_field'])
 
-        if form.is_valid():
-            data = form.cleaned_data['city_choice_field']
-            lat, lon = data.lat, data.lon
-            day = int(form.cleaned_data['forecast_days_limit_choice_field'])
+        weather_forecast = get_wather_by_coords(lat, lon)
+        data_out = weather_forecast.weather_data[:day]
 
-            weather_forecast = get_wather_by_coords(lat, lon)
-            data_out = weather_forecast.weather_data
-
-            CoordPoints.objects.all().delete()
-
-            ctx = {'data': data_out[:day], 'location': location, 'actual_date': datetime.datetime.now()}
-            return render(request, 'weather_api/current_weather.html', ctx)
+        ctx = {'data': data_out, 'location': location, 'actual_date': datetime.datetime.now()}
+        return render(request, 'weather_api/current_weather.html', ctx)
     else:
-        form = SelectCityForm(location)
+        locations = get_all_cities_names(location)
+        form = SelectCityForm(locations)
+
     ctx = {'form': form}
     return render(request, 'weather_api/form.html', ctx)

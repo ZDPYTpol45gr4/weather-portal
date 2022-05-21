@@ -18,25 +18,9 @@ DAYS = (
 
 
 class SelectCityForm(forms.Form):
-    city_choice_field = forms.ModelChoiceField(queryset=CoordPoints.objects.none())
-    forecast_days_limit_choice_field = forms.ChoiceField(choices=DAYS)
+    city_choice_field = forms.ChoiceField(choices=(), label='City')
+    forecast_days_limit_choice_field = forms.ChoiceField(choices=DAYS, label='Select number of days it the forecast')
 
-    def __init__(self, location, *args, **kwargs):
-        self.base_fields['city_choice_field'].queryset = self.get_all_cities_names(location)
+    def __init__(self, locations, *args, **kwargs):
         super(SelectCityForm, self).__init__(*args, **kwargs)
-
-    def get_all_cities_names(self, location):
-        cities = self.get_location(location)
-        print(cities)
-        for city in cities:
-            CoordPoints.objects.create(lat=float(city['lat']), lon=float(city['lon']), state=city['state'])
-        return CoordPoints.objects.all()
-
-    def get_location(self, location):
-        response_location_coords = requests.get(
-            f'http://api.openweathermap.org/geo/1.0/direct?q={location}&limit=5&appid={API_KEY}'
-        )
-
-        get_data_coords = response_location_coords.json()
-
-        return get_data_coords
+        self.fields['city_choice_field'].choices = locations

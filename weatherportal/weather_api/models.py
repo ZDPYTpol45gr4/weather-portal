@@ -11,6 +11,8 @@ class CoordPoints(models.Model):
     lat = models.FloatField()
     lon = models.FloatField()
     state = models.CharField(max_length=100)
+    country = models.CharField(max_length=100)
+    name = models.CharField(max_length=100)
 
     def __str__(self):
-        return f'state: {self.state} - ({self.lat}, {self.lon})'
+        return f'{self.name} {self.country} state: {self.state} - ({self.lat}, {self.lon})'
