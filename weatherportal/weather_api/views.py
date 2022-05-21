@@ -1,11 +1,18 @@
-import os
 import datetime
-
-from django.http import HttpResponseServerError
-from django.shortcuts import render
+import os
+from pprint import pprint
 
 import requests
-from .weather_data_class import WeatherInfo
+import json
+from django.http import HttpResponseServerError
+from django.shortcuts import render, redirect
+
+from .data_classes import WeatherInfo
+from .exceptions import exception_check, ServerResponseError
+from .validators import Validator
+
+from .forms import SelectCityForm
+from .models import CoordPoints
 
 API_KEY = os.getenv('API_KEY')
 
@@ -16,14 +23,14 @@ def get_location(location):
     )
 
     if not response_location_coords.ok:
-        raise ValueError('get_location api response return invalid value')
+        raise ServerResponseError(
+            'location api response return status_code higher then 400'
+        )
 
     get_data_coords = response_location_coords.json()
+    Validator.validate_location(get_data_coords)
 
-    if not get_data_coords:  # check if data are available from api
-        raise ValueError('Empty data from getting location by location')
-
-    return get_data_coords[0]
+    return get_data_coords
 
 
 def get_all_data_forecast_weather_by_location(location):
@@ -37,7 +44,7 @@ def get_all_data_forecast_weather_by_location(location):
         Historical weather data for the previous 5 days
     """
 
-    data_coords = get_location(location)
+    data_coords = get_location(location)[0]
 
     lat = data_coords['lat']
     lon = data_coords['lon']
@@ -47,27 +54,64 @@ def get_all_data_forecast_weather_by_location(location):
     )
 
     if not response_weather.ok:
-        raise ValueError('get_all_data_forecast_weather_by_location api response return invalid value')
+        raise ServerResponseError(
+            'get_all_data_forecast_weather_by_location api response return status_code higher then 400'
+        )
+
+    return response_weather.json()
+
+
+def get_all_data_forecast_weather_by_coords(lat, lon):
+    """
+    Get weather data from api:
+        Current weather
+        Minute forecast for 1 hour
+        Hourly forecast for 48 hours
+        Daily forecast for 7 days
+        National weather alerts
+        Historical weather data for the previous 5 days
+    """
+
+    response_weather = requests.get(
+        f'https://api.openweathermap.org/data/2.5/onecall?lat={lat}&lon={lon}&units=metric&appid={API_KEY}'
+    )
+
+    if not response_weather.ok:
+        raise ServerResponseError(
+            'get_all_data_forecast_weather_by_location api response return status_code higher then 400'
+        )
 
     return response_weather.json()
 
 
 def get_weather(location):
+    """
+        Get weather and validate data
+    """
     data = get_all_data_forecast_weather_by_location(location)
+    Validator.validate_weather(data)
+
     return WeatherInfo.get_weather_list_from_dict(data, get_days_format())
 
 
-def get_actual_date():
-    return datetime.datetime.now()
+def get_wather_by_coords(lat, lon):
+    """
+        Get weather by coordinates and validate data
+    """
+    data = get_all_data_forecast_weather_by_coords(lat, lon)
+    Validator.validate_weather(data)
+
+    return WeatherInfo.get_weather_list_from_dict(data, get_days_format())
 
 
-def get_days_format(days=8):
+def get_days_format():
     """
         Function return list of named days, they are up to param 'days'
     """
+    DAYS_NUMBER = 8
 
-    dates = [(get_actual_date() + datetime.timedelta(days=day)).strftime("%A")
-             for day in range(days)]
+    dates = [(datetime.datetime.now() + datetime.timedelta(days=day)).strftime("%A")
+             for day in range(DAYS_NUMBER)]
     return dates
 
 
@@ -79,16 +123,52 @@ def weather_multi_days_view(request, location, day):
         :param day: number of days for forecast
         :return: weather view
     """
-
     try:
         data = get_weather(location)
-    except Exception as e:
-        return HttpResponseServerError(f'<h1>{e}</h1>', content_type='text/html')
-
-    if not data:
-        return HttpResponseServerError('<h1>Server Error (500)</h1>', content_type='text/html')
+    except Exception as exce:
+        message = exception_check(exce)
+        return HttpResponseServerError(message, content_type='text/html')
 
     data = data.weather_data[:day]
 
-    ctx = {'data': data, 'location': location, 'actual_date': get_actual_date()}
+    ctx = {'data': data, 'location': location, 'actual_date': datetime.datetime.now()}
     return render(request, 'weather_api/current_weather.html', ctx)
+
+
+def get_all_cities_names(location):
+    cities = get_location(location)
+    print('cities', cities)
+    print(len(cities))
+    out_lst = []
+    for city in cities:
+        lat = float(city['lat'])
+        lon = float(city['lon'])
+        coords_objects = CoordPoints(lat=lat, lon=lon, state=city['state'],
+                                     name=city['name'], country=city['country'])
+        out_lst.append((f'{lat}, {lon}', coords_objects))
+
+    return out_lst
+
+
+def cities_form_view(request, location):
+    """
+        Form allows user to choice city, cities can have same name in different location
+    """
+    if request.method == 'POST':
+        post = request.POST
+        coords = post['city_choice_field'].split(',')
+
+        lat, lon = float(coords[0]), float(coords[1])
+        day = int(request.POST['forecast_days_limit_choice_field'])
+
+        weather_forecast = get_wather_by_coords(lat, lon)
+        data_out = weather_forecast.weather_data[:day]
+
+        ctx = {'data': data_out, 'location': location, 'actual_date': datetime.datetime.now()}
+        return render(request, 'weather_api/current_weather.html', ctx)
+    else:
+        locations = get_all_cities_names(location)
+        form = SelectCityForm(locations)
+
+    ctx = {'form': form}
+    return render(request, 'weather_api/form.html', ctx)
